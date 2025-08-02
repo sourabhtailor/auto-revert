@@ -13,7 +13,7 @@ permissions:
   contents: write  # Required to push revert commit
 
 jobs:
-  sonar-quality-check:
+    sonar-quality-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,8 +38,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-        Step 4: Revert code if quality gate fails
-        - name: Revert bad commit(s)
+            # Step 4: Revert code if quality gate fails
+      - name: Revert bad commit(s)
         if: failure()
         run: |
           echo "Quality Gate failed. Reverting the commit(s)..."
