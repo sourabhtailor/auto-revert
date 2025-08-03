@@ -51,10 +51,10 @@ jobs:
             git checkout dev
             git pull origin dev
 
-           # Revert the pushed commit(s)
+               # Revert the pushed commit(s)
             git revert --no-edit ${{ github.event.before }}..${{ github.sha }}
-
+            
             echo "Pushing revert to origin/dev..."
             for i in {1..3}; do
-            git pull origin dev && git push origin dev && break || sleep 3
+             git pull origin dev && git push origin dev && break || sleep 3
             done
