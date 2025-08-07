@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Number of files to create
-NUM_FILES=1000
+NUM_FILES=80
 
 # Target directory for fake files
 TARGET_DIR="./fake_php_src"
