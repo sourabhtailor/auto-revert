@@ -34,7 +34,7 @@ jobs:
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.qualitygate.wait=true
-            -Dsonar.exclusions=-Dsonar.exclusions=**/[Bb][Aa][Cc][Kk][Uu][Pp]*/*,**/*[Bb][Aa][Cc][Kk][Uu][Pp]*/*,**/[Pp][Dd][Ff]*/*,**/*[Pp][Dd][Ff]*/*,**/[Ll][Oo][Gg]*/*,**/*[Ll][Oo][Gg]*/*,**/[Ss][Ii][Mm][Pp][Ll][Ee][Ss][Aa][Mm][Ll][Pp][Hh][Pp]*/**,**/[Vv][Ee][Nn][Dd][Oo][Rr]*/**,**/*[Vv][Ee][Nn][Dd][Oo][Rr]*/*
+            -Dsonar.exclusions=**/[Bb][Aa][Cc][Kk][Uu][Pp]*/*,**/*[Bb][Aa][Cc][Kk][Uu][Pp]*/*,**/[Pp][Dd][Ff]*/*,**/*[Pp][Dd][Ff]*/*,**/[Ll][Oo][Gg]*/*,**/*[Ll][Oo][Gg]*/*,**/[Ss][Ii][Mm][Pp][Ll][Ee][Ss][Aa][Mm][Ll][Pp][Hh][Pp]*/**,**/[Vv][Ee][Nn][Dd][Oo][Rr]*/**,**/*[Vv][Ee][Nn][Dd][Oo][Rr]*/*
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
