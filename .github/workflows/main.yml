@@ -32,7 +32,7 @@ jobs:
             -Dsonar.projectKey=sourabhtailor_autodelete-code
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
-            -Dsonar.exclusions=vendor/**,tests/**,.github/**
+            -Dsonar.exclusions=vendor/**,tests/**,.github/**,fake-src,php2,php3
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}
             -Dsonar.qualitygate.wait=true
         env:
