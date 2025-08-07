@@ -34,7 +34,7 @@ jobs:
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.qualitygate.wait=true
-            -Dsonar.exclusions=**/*backup*/**/*,**/*Backup*/**/*,**/*BACKUP*/**/*,**/*BackUp*/**/*
+            -Dsonar.exclusions=**/*backup*/**/*,**/*Backup*/**/*,**/*BACKUP*/**/*,**/*BackUp*/**/*,**/*pdf*/**/*,**/*Pdf*/**/*,**/*log*/**/*,**/*vendor*/**/*,**/*pdf*/**/*,**/*Vendor*/**/*,**/*test*/**/*,**/*log*/**/*
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
