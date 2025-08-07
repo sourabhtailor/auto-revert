@@ -32,7 +32,8 @@ jobs:
             -Dsonar.projectKey=sourabhtailor_autodelete-code
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
-            -Dsonar.exclusions=vendor/**,tests/**,.github/**
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.exclusions=vendor/**,tests/**,.github/**,**/fake-src/**
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}
             -Dsonar.qualitygate.wait=true
         env:
