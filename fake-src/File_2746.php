@@ -1,0 +1,11 @@
+<?php
+// Fake file 2746
+class DummyClass2746 {
+    public function test() {
+        $var = 'This is a test line';
+        for ($i = 0; $i < 100; $i++) {
+            echo $var;
+        }
+    }
+}
+?>

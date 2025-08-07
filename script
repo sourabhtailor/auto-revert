@@ -1,0 +1,17 @@
+mkdir -p fake-src
+
+for i in {1..10000}; do
+  cat <<EOF > fake-src/File_$i.php
+<?php
+// Fake file $i
+class DummyClass$i {
+    public function test() {
+        \$var = 'This is a test line';
+        for (\$i = 0; \$i < 100; \$i++) {
+            echo \$var;
+        }
+    }
+}
+?>
+EOF
+done
