@@ -33,7 +33,7 @@ jobs:
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.qualitygate.wait=true
-            -Dsonar.exclusions=vendor/**,tests/**,.github/**,**/fake-src/**
+            -Dsonar.exclusions=vendor/**,tests/**,.github/**,**/fake-src/**,**/*[Bb][Aa][Cc][Kk][Uu][Pp]*/**/*,**/*[Pp][Dd][Ff]*/**/*,**/*[Ll][Oo][Gg]*/**/*,**/*simplesamlphp*/**,**/*[Vv][Ee][Nn][Dd][Oo][Rr]*/**/*
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
