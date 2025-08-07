@@ -26,7 +26,7 @@ jobs:
       # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan
         id: sonar
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@v2.1.1
         with:
           args: >
             -Dsonar.projectKey=sourabhtailor_autodelete-code
