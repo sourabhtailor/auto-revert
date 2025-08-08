@@ -25,7 +25,9 @@ jobs:
 
       - name: Get changed files since last push
         run: |
-            echo "FILES=$(git diff --name-only ${{ github.event.before }}..${{ github.sha }} | tr '\n' ',')" >> $GITHUB_ENV
+                git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+                | grep '\.php$' \
+                | tr '\n' ',' > changed_files.txt
       
        # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan
@@ -35,7 +37,8 @@ jobs:
           args: >
             -Dsonar.projectKey=sourabhtailor_autodelete-code
             -Dsonar.organization=sourabhtailor
-            -Dsonar.sources=${{ env.FILES }}
+            -Dsonar.sources=.
+            -Dsonar.inclusions=$(cat changed_files.txt) 
             -Dsonar.qualitygate.wait=true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
