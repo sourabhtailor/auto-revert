@@ -88,8 +88,8 @@ PHP,
 ];
 
 // Number of files per vulnerability type
-$filesPerType = 7;
-$count = 1;
+$filesPerType = 700;
+$count = 100;
 
 foreach ($templates as $type => $template) {
     for ($i = 1; $i <= $filesPerType; $i++) {
