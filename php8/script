@@ -1,0 +1,136 @@
+<?php
+$testDir = __DIR__ . '/heavy_test_files';
+if (!is_dir($testDir)) {
+    mkdir($testDir, 0755, true);
+}
+
+// Complex templates with real-world structures
+$templates = [
+    'auth' => <<<PHP
+<?php
+// Auth Logic #{n}
+session_start();
+\$user = \$_POST['user'] ?? '';
+\$pass = \$_POST['pass'] ?? '';
+if (\$user === 'admin' && \$pass === 'password') {
+    \$_SESSION['auth'] = true;
+    echo "Welcome admin!";
+} else {
+    echo "Invalid credentials";
+}
+?>
+<form method="POST">
+<input name="user">
+<input name="pass" type="password">
+<input type="submit" value="Login">
+</form>
+PHP,
+
+    'loop_file' => <<<PHP
+<?php
+// Heavy loop file #{n}
+for (\$i = 0; \$i < 10000; \$i++) {
+    echo "Line \$i<br>";
+}
+?>
+PHP,
+
+    'file_ops' => <<<PHP
+<?php
+// File operations #{n}
+\$f = fopen("file_{n}.txt", "w");
+fwrite(\$f, str_repeat("Test line\\n", 1000));
+fclose(\$f);
+echo "File written.";
+?>
+PHP,
+
+    'sql_query' => <<<PHP
+<?php
+// SQL logic #{n}
+\$mysqli = new mysqli("localhost", "root", "", "test_db");
+\$input = \$_GET['query'] ?? '';
+\$res = \$mysqli->query("SELECT * FROM data WHERE info LIKE '%\$input%'");
+while (\$row = \$res->fetch_assoc()) {
+    echo \$row['info'] . "<br>";
+}
+?>
+PHP,
+
+    'session_xss' => <<<PHP
+<?php
+// Session + XSS test #{n}
+session_start();
+\$msg = \$_SESSION['msg'] = \$_GET['msg'] ?? 'hello';
+echo "Message: " . \$msg;
+?>
+PHP,
+
+    'eval_logic' => <<<PHP
+<?php
+// Eval with control logic #{n}
+\$code = \$_GET['run'] ?? 'echo "safe";';
+if (strpos(\$code, 'system') === false) {
+    eval(\$code);
+} else {
+    echo "Blocked dangerous code.";
+}
+?>
+PHP,
+
+    'nested_logic' => <<<PHP
+<?php
+// Nested PHP logic #{n}
+\$data = \$_GET['data'] ?? '';
+for (\$i = 0; \$i < 5; \$i++) {
+    for (\$j = 0; \$j < 5; \$j++) {
+        echo "Iteration \$i-\$j: \$data<br>";
+    }
+}
+?>
+PHP,
+
+    'upload_write_exec' => <<<PHP
+<?php
+// Upload + write + include combo #{n}
+if (\$_SERVER['REQUEST_METHOD'] === 'POST' && isset(\$_FILES['file'])) {
+    \$target = 'uploads/' . basename(\$_FILES['file']['name']);
+    move_uploaded_file(\$_FILES['file']['tmp_name'], \$target);
+    echo "Uploaded and included: ";
+    include(\$target);
+}
+?>
+<form method="POST" enctype="multipart/form-data">
+<input type="file" name="file">
+<input type="submit" value="Upload & Include">
+</form>
+PHP,
+];
+
+// Number of files per type
+$filesPerType = 15;
+$count = 1;
+
+foreach ($templates as $type => $template) {
+    for ($i = 1; $i <= $filesPerType; $i++) {
+        $filename = "{$type}_{$i}.php";
+        $content = str_replace('{n}', $i, $template);
+        file_put_contents($testDir . '/' . $filename, $content);
+        echo "Created: $filename\n";
+        $count++;
+    }
+}
+
+// Optional: generate an index
+$indexContent = "<h1>Heavy Test Files Index</h1><ul>";
+foreach (glob($testDir . "/*.php") as $file) {
+    $base = basename($file);
+    $indexContent .= "<li><a href='heavy_test_files/$base'>$base</a></li>";
+}
+$indexContent .= "</ul>";
+file_put_contents(__DIR__ . '/index.php', $indexContent);
+
+echo "\n✅ Total files created: " . ($count - 1) . "\n";
+echo "Browse via: index.php or open heavy_test_files/ in browser\n";
+?>
+
