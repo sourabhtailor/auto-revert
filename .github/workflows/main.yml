@@ -42,10 +42,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-        # Step 4: Revert code if quality gate fails
-       - name: Revert bad commit(s)
-         if: failure()
-         run: |
+           # Step 4: Revert code if quality gate fails
+      - name: Revert bad commit(s)
+        if: failure()
+        run: |
              echo "Quality Gate failed. Reverting the commit(s)..."
 
              git config --global user.email "actions@github.com"
