@@ -28,20 +28,22 @@ jobs:
                  echo "FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | paste -sd, -)" >> $GITHUB_ENV
       
        # Step 3: Run SonarCloud scan with quality gate blocking
-      - name: Run SonarScanner on changed files
-        run: |
-          if [ -n "${FILES}" ]; then
-            echo "Scanning only changed files: ${FILES}"
-            sonar-scanner \
-              -Dsonar.projectKey=my_project_key \
-              -Dsonar.sources=. \
-              -Dsonar.inclusions="${FILES}" \
-              -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-          else
-            echo "No files changed. Skipping scan."
-          fi
+      - name: SonarCloud Scan (if files changed)
+        if: env.FILES != ''
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=my_project_key
+            -Dsonar.organization=my_org
+            -Dsonar.sources=${{ env.FILES }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Skip SonarCloud Scan (no changes)
+        if: env.FILES == ''
+        run: echo "No file changes detected. Skipping Sonar scan."
+      
 
       #      # Step 4: Revert code if quality gate fails
       # - name: Revert bad commit(s)
