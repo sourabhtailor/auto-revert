@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
+       # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -27,7 +27,7 @@ jobs:
         run: |
             echo "FILES=$(git diff --name-only ${{ github.event.before }}..${{ github.sha }} | tr '\n' ',')" >> $GITHUB_ENV
       
-      # Step 3: Run SonarCloud scan with quality gate blocking
+       # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan
         id: sonar
         uses: SonarSource/sonarcloud-github-action@v2.1.1
@@ -42,7 +42,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-       # Step 4: Revert code if quality gate fails
+        # Step 4: Revert code if quality gate fails
        - name: Revert bad commit(s)
          if: failure()
          run: |
