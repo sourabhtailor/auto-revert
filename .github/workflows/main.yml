@@ -37,7 +37,6 @@ jobs:
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=${{ env.FILES }}
             -Dsonar.qualitygate.wait=true
-            # -Dsonar.projectVersion=v1.0.${{ github.run_number }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
