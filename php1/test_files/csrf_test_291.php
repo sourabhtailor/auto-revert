@@ -1,7 +1,8 @@
 <?php
 // CSRF test variation #291
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "Changed password for user!";
+check karo    
+	echo "Changed password for user!";
 }
 ?>
 <form method="POST">
