@@ -1,5 +1,0 @@
-<?php
-// Eval injection test variation #272
-$code = $_GET['code'] ?? 'echo "test";';
-eval($code);
-?>
