@@ -25,9 +25,9 @@ jobs:
 
       - name: Get changed files since last push
         run: |
-                git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-                | grep '\.php$' \
-                | tr '\n' ',' > changed_files.txt
+               git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+               | grep '\.php$' \
+               | paste -sd, - > changed_files.txt
       
        # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan
