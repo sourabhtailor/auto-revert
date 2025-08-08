@@ -38,7 +38,7 @@ jobs:
             -Dsonar.projectKey=sourabhtailor_autodelete-code
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
-            -Dsonar.inclusions=$(cat changed_files.txt) 
+            -Dsonar.inclusions="$(cat changed_files.txt)" 
             -Dsonar.qualitygate.wait=true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
