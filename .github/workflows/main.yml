@@ -33,8 +33,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=my_project_key
-            -Dsonar.organization=my_org
+            -Dsonar.projectKey=sourabhtailor_autodelete-code
+            -Dsonar.organization=sourabhtailor
             -Dsonar.sources=${{ env.FILES }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         env:
