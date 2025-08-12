@@ -34,6 +34,7 @@ jobs:
             | paste -sd, -)
 
           echo "FILES=$CHANGED_FILES" >> $GITHUB_ENV
+          echo "changed Files: $CHANGED_FILES"
       
        # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan (if files changed)
