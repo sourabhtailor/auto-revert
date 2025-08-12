@@ -26,24 +26,15 @@ jobs:
       - name: Get changed PHP/JS files since last push
         id: changed
         run: |
-<<<<<<< HEAD
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
             | grep -E '\.(php|js)$' \
             | grep -v '^$' \
-=======
-           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-            | grep -Ei '\.(php|js)$' \
->>>>>>> 5e6702a53 (done)
             | while read file; do
                 if [ -f "$file" ]; then echo "$file"; fi
-                done \
+              done \
             | paste -sd, -)
-<<<<<<< HEAD
       
           echo "FILES=$CHANGED_FILES" >> $GITHUB_ENV
-=======
-           echo "FILES=$CHANGED_FILES" >> $GITHUB_ENV
->>>>>>> 5e6702a53 (done)
       
        # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan (if files changed)
