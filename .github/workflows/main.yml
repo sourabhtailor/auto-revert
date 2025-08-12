@@ -21,20 +21,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 500
+          fetch-depth: 50
 
-      - name: Get changed files since last push
+      - name: Get changed PHP/JS files since last push
         id: changed
         run: |
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+            | grep -E '\.(php|js)$' \
             | grep -v '^$' \
             | while read file; do
                 if [ -f "$file" ]; then echo "$file"; fi
               done \
             | paste -sd, -)
-
+      
           echo "FILES=$CHANGED_FILES" >> $GITHUB_ENV
-          echo "changed Files: $CHANGED_FILES"
       
        # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan (if files changed)
@@ -45,7 +45,6 @@ jobs:
             -Dsonar.projectKey=autodelete-code
             -Dsonar.organization=autodelete-code
             -Dsonar.sources=.
-            -Dsonar.host.url=http://101.53.150.196:9000
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}            
             -Dsonar.inclusions=${{ env.FILES }}
             -Dsonar.qualitygate.wait=true
@@ -56,6 +55,24 @@ jobs:
         if: env.FILES == ''
         run: echo "No file changes detected. Skipping Sonar scan."
       
+      - name: Create GitHub Issue on Pipeline or SonarCloud Failure
+        if: failure() && env.FILES != ''
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: " CI or SonarCloud Scan Failed"
+          content: |
+            The CI pipeline or SonarCloud Quality Gate **failed** on branch `${{ github.ref_name }}`.
+      
+            - **Commit**: `${{ github.sha }}`
+            - **Author**: `${{ github.actor }}`
+            - **Workflow**: `${{ github.workflow }}`
+      
+            Please fix the issues as soon as possible.
+      
+            /cc @your-org/your-team-name
+          labels: sonar, ci, failure, alert
+            
+
 
       #      # Step 4: Revert code if quality gate fails
       # - name: Revert bad commit(s)
