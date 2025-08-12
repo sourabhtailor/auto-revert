@@ -26,7 +26,7 @@ jobs:
       - name: Get changed files since last push
         id: changed
         run: |
-          CHANGED_FILES=$(git diff --name-only bd265f6f0169331b6af60353bf87be3f32b67b08 372ad947f58adcfab86ebda643f36d18dd0103d8 \
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
             | grep -v '^$' \
             | while read file; do
                 if [ -f "$file" ]; then echo "$file"; fi
