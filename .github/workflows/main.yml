@@ -43,7 +43,8 @@ jobs:
           args: >
             -Dsonar.projectKey=autodelete-code
             -Dsonar.organization=autodelete-code
-            -Dsonar.sources=${{ env.FILES }}
+            -Dsonar.sources=.
+            -Dsonar.inclusions=${{ env.FILES }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.qualitygate.wait=true
             -Dsonar.coverage.exclusions=**
