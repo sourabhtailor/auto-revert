@@ -24,8 +24,16 @@ jobs:
           fetch-depth: 100
 
       - name: Get changed files since last push
+        id: changed
         run: |
-                 echo "FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | paste -sd, -)" >> $GITHUB_ENV
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+            | grep -v '^$' \
+            | while read file; do
+                if [ -f "$file" ]; then echo "$file"; fi
+              done \
+            | paste -sd, -)
+
+          echo "FILES=$CHANGED_FILES" >> $GITHUB_ENV
       
        # Step 3: Run SonarCloud scan with quality gate blocking
       - name: SonarCloud Scan (if files changed)
