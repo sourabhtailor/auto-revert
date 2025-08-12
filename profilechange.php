@@ -38,8 +38,7 @@ if(($type=="image/jpeg") || ($type=="image/jpg") || ($type=="image/png")){
 				$files++;
 			}
 		}
-		closedir($handle);
-		sleep(1); 
+		closedir($handle); 
 		move_uploaded_file($temp,"patient/$adhar/img/$mypic");
 		echo '<script type="text/javascript">'; 
 	echo 'alert("Your Profile Picture has been updated successfully");'; 
