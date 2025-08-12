@@ -37,7 +37,8 @@ jobs:
             -Dsonar.organization=autodelete-code
             -Dsonar.sources=${{ env.FILES }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.qualitygate.wait=true            
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.host.url=http://101.53.150.196:9000
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
