@@ -55,24 +55,6 @@ jobs:
         if: env.FILES == ''
         run: echo "No file changes detected. Skipping Sonar scan."
       
-      - name: Create GitHub Issue on Pipeline or SonarCloud Failure
-        if: failure() && env.FILES != ''
-        uses: peter-evans/create-issue-from-file@v4
-        with:
-          title: " CI or SonarCloud Scan Failed"
-          content: |
-            The CI pipeline or SonarCloud Quality Gate **failed** on branch `${{ github.ref_name }}`.
-      
-            - **Commit**: `${{ github.sha }}`
-            - **Author**: `${{ github.actor }}`
-            - **Workflow**: `${{ github.workflow }}`
-      
-            Please fix the issues as soon as possible.
-      
-            /cc @your-org/your-team-name
-          labels: sonar, ci, failure, alert
-            
-
 
       #      # Step 4: Revert code if quality gate fails
       # - name: Revert bad commit(s)
