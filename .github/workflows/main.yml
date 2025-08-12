@@ -42,8 +42,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=autodelete-code
-            -Dsonar.organization=autodelete-code
+            -Dsonar.projectKey=sourabhtailor_autodelete-code
+            -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}            
             -Dsonar.inclusions=${{ env.FILES }}
