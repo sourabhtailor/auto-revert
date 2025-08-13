@@ -23,6 +23,7 @@ jobs:
         with:
           fetch-depth: 50
 
+      # Step 1: Get changed PHP/JS files since last push
       - name: Get changed PHP/JS files since last push
         id: changed
         run: |
@@ -34,26 +35,28 @@ jobs:
               done \
             | paste -sd, -)
       
-          echo "FILES=$CHANGED_FILES" >> $GITHUB_ENV
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
       
-       # Step 3: Run SonarCloud scan with quality gate blocking
+      # Step 2: Run SonarCloud scan with quality gate blocking (only if files changed)
       - name: SonarCloud Scan (if files changed)
-        if: env.FILES != ''
+        if: steps.changed.outputs.files != ''
         uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          FILES: ${{ steps.changed.outputs.files }}
         with:
           args: >
             -Dsonar.projectKey=sourabhtailor_autodelete-code
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
-            -Dsonar.projectVersion=v1.0.${{ github.run_number }}            
+            -Dsonar.projectVersion=v1.0.${{ github.run_number }}
             -Dsonar.inclusions=${{ env.FILES }}
             -Dsonar.qualitygate.wait=true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+          
       - name: Skip SonarCloud Scan (no changes)
-        if: env.FILES == ''
+        if: steps.changed.outputs.files == ''
         run: echo "No file changes detected. Skipping Sonar scan."
+
       
 
       #      # Step 4: Revert code if quality gate fails
