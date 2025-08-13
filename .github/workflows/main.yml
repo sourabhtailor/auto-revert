@@ -55,7 +55,7 @@ jobs:
           
       - name: Skip SonarCloud Scan (no changes)
         if: steps.changed.outputs.files == ''
-        run: echo "No file changes detected. Skipping Sonar scan."
+        run: echo "No php or js file changes detected. Skipping Sonar scan."
 
       
 
