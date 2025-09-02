@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Deploy Changed SQL Files') {
+            steps {
+                withCredentials([
+                    usernamePassword(credentialsId: 'rds-credentials', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
+                    string(credentialsId: 'rds-host', variable: 'DB_HOST'),
+                    string(credentialsId: 'rds-name', variable: 'DB_NAME')
+                ]) {
+                    sh '''
+                        set -e
+                        echo "🚀 Checking for changed SQL scripts..."
+                        
+                        CHANGED_SQL=$(git diff --name-only HEAD~1 HEAD | grep '\\.sql$' || true)
+
+                        if [ -z "$CHANGED_SQL" ]; then
+                            echo "ℹ️ No new or changed SQL scripts found. Skipping deployment."
+                            exit 0
+                        fi
+
+                        echo "▶ Changed SQL scripts:"
+                        echo "$CHANGED_SQL"
+
+                        export PGPASSWORD=$DB_PASS
+                        for f in $CHANGED_SQL; do
+                            if [ -f "$f" ]; then
+                                echo "▶ Running $f ..."
+                                psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f "$f"
+                            fi
+                        done
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ SQL deployment completed successfully (only changed files executed)!"
+        }
+        failure {
+            echo "❌ SQL deployment failed!"
+        }
+    }
+}
