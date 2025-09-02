@@ -55,10 +55,6 @@ jobs:
             -Dsonar.inclusions=${{ env.FILES }}
             -Dsonar.qualitygate.wait=true
 
-      - name: Skip SonarCloud Scan (no changes)
-        if: steps.changed.outputs.files == ''
-        run: echo "No PHP or JS file changes detected. Skipping Sonar scan."
-
       # Step 4: Check Quality Gate status
       - name: Check SonarCloud Quality Gate
         if: steps.changed.outputs.files != ''
@@ -74,7 +70,7 @@ jobs:
       - name: Generate Sonar Report (if failed)
         if: steps.qualitygate.outputs.status == 'ERROR'
         run: |
-          echo "❌ SonarCloud Quality Gate Failed" > sonar-report.md
+          echo " SonarCloud Quality Gate Failed" > sonar-report.md
           echo "" >> sonar-report.md
 
           # Group issues by type
