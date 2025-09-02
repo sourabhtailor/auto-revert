@@ -66,15 +66,12 @@ jobs:
           echo "status=$STATUS" >> $GITHUB_OUTPUT
           echo "Quality Gate status: $STATUS"
 
-            # Step 5: Generate grouped Sonar Report (if failed)
+      # Step 5: Generate grouped Sonar Report (if failed)
       - name: Generate Sonar Report (if failed)
         if: steps.qualitygate.outputs.status == 'ERROR'
         run: |
           echo " SonarCloud Quality Gate Failed" > sonar-report.md
           echo "" >> sonar-report.md
-
-          # Convert changed files (comma-separated) into regex for filtering
-          FILE_REGEX=$(echo "${{ steps.changed.outputs.files }}" | sed 's/,/|/g')
 
           # Group issues by type
           for TYPE in VULNERABILITY BUG CODE_SMELL; do
@@ -86,27 +83,19 @@ jobs:
 
             echo "$HEADER" >> sonar-report.md
 
-            curl -s -u "$SONAR_TOKEN:" \
-              "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&branch=${{ github.ref_name }}&types=$TYPE&ps=500" \
-              | jq -r --arg REGEX "$FILE_REGEX" '
-                  .issues[]
-                  | select(.component | test($REGEX))
-                  | "- \(.rule): \(.message) [\(.component):\(.line // "N/A")]"
-                ' >> sonar-report.md
+            curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+              "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&branch=dev&types=$TYPE&ps=50" \
+              | jq -r --arg TYPE "$TYPE" '.issues[] | "- \(.rule): \(.message) [\(.component):\(.line // "N/A")]"' \
+              >> sonar-report.md
 
             echo "" >> sonar-report.md
           done
 
           echo "### Key Metrics" >> sonar-report.md
-          curl -s -u "$SONAR_TOKEN:" \
-            "https://sonarcloud.io/api/measures/component?component=sourabhtailor_devbranch&branch=${{ github.ref_name }}&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density" \
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/measures/component?component=sourabhtailor_devbranch&branch=dev&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density" \
             | jq -r '.component.measures[] | "- \(.metric): \(.value)"' \
             >> sonar-report.md
-
-          # If no matching issues were found
-          if ! grep -q " - " sonar-report.md; then
-            echo "✅ No issues found in changed files" >> sonar-report.md
-          fi
 
 
       # Step 6: Upload report as artifact
