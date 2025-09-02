@@ -2,7 +2,7 @@
 // Hardcoded database credentials (Security Hotspot: S2077)
 $servername = "localhost";
 $username = "root";
-$password = "password";
+$password = "password123";
 $dbname = "test_db";
 
 // Create connection
