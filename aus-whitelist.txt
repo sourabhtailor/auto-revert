@@ -1,0 +1,9 @@
+@echo off
+ 
+set VAR =
+ 
+for /f %%i in ('curl http://checkip.amazonaws.com/') do set VAR=%%i
+ 
+aws ec2 authorize-security-group-ingress --group-id sg-0217174b84d6e8282 --ip-permissions IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges=[{CidrIp=%VAR%/32,Description="Sanjay"}]
+ 
+aws ec2 authorize-security-group-ingress --group-id sg-0217174b84d6e8282 --ip-permissions IpProtocol=udp,FromPort=1194,ToPort=1194,IpRanges=[{CidrIp=%VAR%/32,Description="Sanjay"}]
