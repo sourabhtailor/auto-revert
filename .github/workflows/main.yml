@@ -67,15 +67,49 @@ jobs:
           echo "Quality Gate status: $STATUS"
 
       # Step 5: Generate grouped Sonar Report (if failed)
-      - name: Fetch SonarCloud Report
+      - name: Generate Sonar Report (if failed)
+        if: steps.qualitygate.outputs.status == 'ERROR'
         run: |
-          curl -u ${{ secrets.SONAR_TOKEN }}: \
-          -o sonar-report.json \
-          "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&organization=sourabhtailor&resolved=false&ps=500"
-        continue-on-error: true # Continue even if the API call fails
+          echo " SonarCloud Quality Gate Failed" > sonar-report.md
+          echo "" >> sonar-report.md
 
-      - name: Upload Report as Artifact
-        uses: actions/upload-artifact@v4
+          # Group issues by type
+          for TYPE in VULNERABILITY BUG CODE_SMELL; do
+            case $TYPE in
+              VULNERABILITY) HEADER="### Security Issues (Vulnerabilities)" ;;
+              BUG) HEADER="### Bugs" ;;
+              CODE_SMELL) HEADER="### Code Smells" ;;
+            esac
+          
+            echo "$HEADER" >> sonar-report.md
+          
+            curl -s -u "$SONAR_TOKEN:" \
+              "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&branch=${{ github.ref_name }}&types=$TYPE&ps=50" \
+              | jq -r --arg FILES "${{ steps.changed.outputs.files }}" '
+                  .issues[]
+                  | select(.component | test($FILES))   # 🔑 filter only changed files
+                  | "- \(.rule): \(.message) [\(.component):\(.line // "N/A")]"
+                ' >> sonar-report.md
+          
+            echo "" >> sonar-report.md
+          done
+
+
+          echo "### Key Metrics" >> sonar-report.md
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/measures/component?component=sourabhtailor_devbranch&branch=dev&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density" \
+            | jq -r '.component.measures[] | "- \(.metric): \(.value)"' \
+            >> sonar-report.md
+
+
+      # Step 6: Upload report as artifact
+      - uses: actions/upload-artifact@v4
+        if: steps.qualitygate.outputs.status == 'ERROR'
         with:
-          name: sonarcloud-report
-          path: sonar-report.json
+          name: sonar-failed-report-${{ github.sha }}
+          path: sonar-report.md
+
+      # Step 7: Explicitly fail if Quality Gate failed
+      - name: Fail pipeline if Sonar failed
+        if: steps.qualitygate.outputs.status == 'ERROR'
+        run: exit 1
