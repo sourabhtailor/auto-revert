@@ -40,13 +40,13 @@ jobs:
       # Step 2: Run SonarCloud scan with quality gate blocking (only if files changed)
       - name: SonarCloud Scan (if files changed)
         if: steps.changed.outputs.files != ''
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@v5.3.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           FILES: ${{ steps.changed.outputs.files }}
         with:
           args: >
-            -Dsonar.projectKey=sourabhtailor_autodelete-code
+            -Dsonar.projectKey=sourabhtailor_devbranch
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.projectVersion=v1.0.${{ github.run_number }}
