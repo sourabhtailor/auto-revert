@@ -1,0 +1,3 @@
+DB_USERNAME root
+DB_PASSWORD= 123498
+DB_USER= deepak
