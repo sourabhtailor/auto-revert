@@ -72,7 +72,10 @@ jobs:
         run: |
           echo " SonarCloud Quality Gate Failed" > sonar-report.md
           echo "" >> sonar-report.md
-
+      
+          CHANGED_FILES="${{ steps.changed.outputs.files }}"
+          IFS=',' read -ra FILES <<< "$CHANGED_FILES"
+      
           # Group issues by type
           for TYPE in VULNERABILITY BUG CODE_SMELL; do
             case $TYPE in
@@ -80,22 +83,29 @@ jobs:
               BUG) HEADER="### Bugs" ;;
               CODE_SMELL) HEADER="### Code Smells" ;;
             esac
-
+      
             echo "$HEADER" >> sonar-report.md
-
-            curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
-              "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&branch=dev&types=$TYPE&ps=50" \
-              | jq -r --arg TYPE "$TYPE" '.issues[] | "- \(.rule): \(.message) [\(.component):\(.line // "N/A")]"' \
-              >> sonar-report.md
-
+      
+            # Fetch issues from SonarCloud API
+            ISSUES_JSON=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+              "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&branch=dev&types=$TYPE&ps=500")
+      
+            # Loop over only changed files and add issues to report
+            for FILE in "${FILES[@]}"; do
+              echo "$ISSUES_JSON" \
+                | jq -r --arg FILE "$FILE" '.issues[] | select(.component | endswith($FILE)) | "- \(.rule): \(.message) [\(.component):\(.line // "N/A")]"' \
+                >> sonar-report.md
+            done
+      
             echo "" >> sonar-report.md
           done
-
+      
           echo "### Key Metrics" >> sonar-report.md
           curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
             "https://sonarcloud.io/api/measures/component?component=sourabhtailor_devbranch&branch=dev&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density" \
             | jq -r '.component.measures[] | "- \(.metric): \(.value)"' \
             >> sonar-report.md
+
 
 
       # Step 6: Upload report as artifact
