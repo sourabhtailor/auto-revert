@@ -58,7 +58,43 @@ jobs:
         if: steps.changed.outputs.files == ''
         run: echo "No php or js file changes detected. Skipping Sonar scan."
 
-      
+     
+      # Step 4: Check SonarCloud Quality Gate status
+      - name: Check SonarCloud Quality Gate
+        if: steps.changed.outputs.files != ''
+        id: qualitygate
+        run: |
+          STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=sourabhtailor_devbranch&branch=dev" \
+            | jq -r '.projectStatus.status')
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+
+      # Step 5: Generate report if Quality Gate failed
+      - name: Generate Sonar Report (if failed)
+        if: steps.qualitygate.outputs.status == 'ERROR'
+        run: |
+          echo "❌ SonarCloud Quality Gate Failed" > sonar-report.md
+          echo "" >> sonar-report.md
+          echo "### Issues Found" >> sonar-report.md
+
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=sourabhtailor_devbranch&branch=dev&ps=50" \
+            | jq -r '.issues[] | "- \(.type): \(.message) [\(.component):\(.line // "N/A")]"' \
+            >> sonar-report.md
+
+          echo "" >> sonar-report.md
+          echo "### Key Metrics" >> sonar-report.md
+          curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/measures/component?component=sourabhtailor_devbranch&branch=dev&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density" \
+            | jq -r '.component.measures[] | "- \(.metric): \(.value)"' \
+            >> sonar-report.md
+
+      # Step 6: Upload report as artifact
+      - uses: actions/upload-artifact@v4
+        if: steps.qualitygate.outputs.status == 'ERROR'
+        with:
+          name: sonar-failed-report-${{ github.sha }}
+          path: sonar-report.md
 
       #      # Step 4: Revert code if quality gate fails
       # - name: Revert bad commit(s)
