@@ -45,6 +45,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           FILES: ${{ steps.changed.outputs.files }}
         with:
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=sourabhtailor_devbranch
             -Dsonar.organization=sourabhtailor
